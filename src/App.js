@@ -24,10 +24,19 @@ function Logo() {
 function Form() {
   const [description, setDescription] = useState("Item");
   const [quantity, setQuantity] = useState(1);
+
   function handleSubmit(event) {
     event.preventDefault();
-    console.log(event);
+
+    if (description === "") return;
+
+    const newItem = { description, quantity, packed: false, id: Date.now() };
+    console.log(newItem);
+
+    setDescription("");
+    setQuantity(1);
   }
+
   return (
     <form className="add-form" onSubmit={handleSubmit}>
       <h3>What do you need for your trip? 😍</h3>
