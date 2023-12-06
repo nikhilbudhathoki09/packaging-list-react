@@ -4,7 +4,6 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  overflow: hidden;
 }
 
 html {
@@ -102,6 +101,8 @@ input {
   gap: 1.2rem;
   justify-content: center;
   align-content: start;
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 .list li {
