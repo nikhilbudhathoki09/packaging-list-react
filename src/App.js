@@ -11,12 +11,25 @@ export default function App() {
     //lifting the state up (We can pass it as a props to the child component)
     setItems((items) => items.filter((item) => item.id !== id));
   }
+
+  function handlePackedItems(id) {
+    setItems((items) =>
+      items.map((item) =>
+        item.id === id ? { ...item, packed: !item.packed } : item
+      )
+    );
+  }
+
   return (
     <div className="app">
       <Logo />
       <Form onAddItems={addItems} />
-      <PackingList items={items} onDeleteItems={handleRemoveItem} />
-      <Stats />
+      <PackingList
+        items={items}
+        onDeleteItems={handleRemoveItem}
+        togglePackedItems={handlePackedItems}
+      />
+      <Stats items={items} />
     </div>
   );
 }
@@ -37,7 +50,6 @@ function Form({ onAddItems }) {
     const newItem = { description, quantity, packed: false, id: Date.now() };
 
     onAddItems(newItem); //function taken as a prop from the parrent component
-
     setDescription("");
     setQuantity(1);
   }
@@ -70,13 +82,18 @@ function Form({ onAddItems }) {
   );
 }
 
-function PackingList({ items, onDeleteItems }) {
+function PackingList({ items, onDeleteItems, togglePackedItems }) {
   return (
     <div className="list">
       {
         <ul>
           {items.map((item) => (
-            <Item item={item} onDeleteItems={onDeleteItems} key={item.id} />
+            <Item
+              item={item}
+              onDeleteItems={onDeleteItems}
+              key={item.id}
+              togglePackedItems={togglePackedItems}
+            />
           ))}
         </ul>
       }
@@ -84,17 +101,13 @@ function PackingList({ items, onDeleteItems }) {
   );
 }
 
-function Item({ item, onDeleteItems }) {
-  const [packed, setPacked] = useState(false);
-  function checkPackedItems(id) {
-    setPacked(!packed);
-  }
+function Item({ item, onDeleteItems, togglePackedItems }) {
   return (
     <li>
       <input
         type="checkbox"
-        checked={packed}
-        onChange={() => checkPackedItems(item.id)}
+        checked={item.packed}
+        onChange={() => togglePackedItems(item.id)}
       ></input>
       <span
         style={
@@ -112,10 +125,26 @@ function Item({ item, onDeleteItems }) {
   );
 }
 
-function Stats() {
+function Stats({ items }) {
+  if (items.length === 0) {
+    return (
+      <footer className="stats">
+        <em>Start adding your list now 🎈</em>
+      </footer>
+    );
+  }
+  const totalItems = items.length;
+  const packedItems = items.filter((item) => item.packed).length;
+  const percentage =
+    totalItems > 0 ? Math.round((packedItems / totalItems) * 100) : 0;
   return (
     <footer className="stats">
-      <em> You have X items on your list, and you already packed X(X%)</em>
+      <em>
+        {percentage === 100
+          ? "You are ready to go! 🥳"
+          : `You have ${totalItems} items on your list, and you already packed ${packedItems}
+        (${percentage}%) of them! 💼`}
+      </em>
     </footer>
   );
 }
