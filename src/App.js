@@ -1,11 +1,5 @@
 import { useState } from "react";
 
-const initialItems = [
-  { id: 1, description: "Passports", quantity: 2, packed: false },
-  { id: 2, description: "Socks", quantity: 12, packed: false },
-  { id: 3, description: "Charger", quantity: 2, packed: true },
-];
-
 export default function App() {
   const [items, setItems] = useState([]); //lifting the state up to the nearest parent component so that it can be used on another component
 
@@ -14,6 +8,7 @@ export default function App() {
   }
 
   function handleRemoveItem(id) {
+    //lifting the state up (We can pass it as a props to the child component)
     setItems((items) => items.filter((item) => item.id !== id));
   }
   return (
@@ -54,11 +49,15 @@ function Form({ onAddItems }) {
         value={quantity}
         onChange={(e) => setQuantity(Number(e.target.value))}
       >
-        {Array.from({ length: 20 }, (_, i) => i + 1).map((num) => (
-          <option vlaue={num} key={num}>
-            {num}
-          </option>
-        ))}
+        {Array.from({ length: 20 }, (_, i) => i + 1).map(
+          (
+            num //for generating the  numbers from 1 to 20
+          ) => (
+            <option vlaue={num} key={num}>
+              {num}
+            </option>
+          )
+        )}
       </select>
       <input
         type="text"
@@ -86,8 +85,17 @@ function PackingList({ items, onDeleteItems }) {
 }
 
 function Item({ item, onDeleteItems }) {
+  const [packed, setPacked] = useState(false);
+  function checkPackedItems(id) {
+    setPacked(!packed);
+  }
   return (
     <li>
+      <input
+        type="checkbox"
+        checked={packed}
+        onChange={() => checkPackedItems(item.id)}
+      ></input>
       <span
         style={
           item.packed
